@@ -39,7 +39,7 @@ impl TcpServer {
                         while let Some(result) = reader.next().await {
                             match result {
                                 Ok(request) => {
-                                    let response = handler.handle_request(&request);
+                                    let response = handler.handle_request(request);
                                     match response {
                                         None => {}
                                         Some(response) => {
