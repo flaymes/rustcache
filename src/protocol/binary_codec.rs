@@ -1,9 +1,9 @@
-use std::io;
 use actix::Message;
 use byteorder::{BigEndian, ByteOrder};
 use bytes::{Buf, BufMut, BytesMut};
 use num_traits::FromPrimitive;
 use serde_derive::{Deserialize, Serialize};
+use std::io;
 use tokio_util::codec::{Decoder, Encoder};
 
 use crate::protocol::binary;
@@ -23,13 +23,13 @@ pub enum BinaryRequest {
 impl BinaryRequest {
     pub fn get_header(&self) -> &binary::RequestHeader {
         match self {
-            BinaryRequest::Get(request) => { &request.header }
-            BinaryRequest::GetQuietly(request) => { &request.header }
-            BinaryRequest::GetKey(request) => { &request.header }
-            BinaryRequest::GetKeyQuietly(request) => { &request.header }
-            BinaryRequest::Set(request) => { &request.header }
-            BinaryRequest::Add(request) => { &request.header }
-            BinaryRequest::Replace(request) => { &request.header }
+            BinaryRequest::Get(request) => &request.header,
+            BinaryRequest::GetQuietly(request) => &request.header,
+            BinaryRequest::GetKey(request) => &request.header,
+            BinaryRequest::GetKeyQuietly(request) => &request.header,
+            BinaryRequest::Set(request) => &request.header,
+            BinaryRequest::Add(request) => &request.header,
+            BinaryRequest::Replace(request) => &request.header,
         }
     }
 }
@@ -49,13 +49,13 @@ pub enum BinaryResponse {
 impl BinaryResponse {
     pub fn get_header(&self) -> &binary::ResponseHeader {
         match self {
-            BinaryResponse::Get(response) => { &response.header }
-            BinaryResponse::GetQuietly(response) => { &response.header }
-            BinaryResponse::GetKey(response) => { &response.header }
-            BinaryResponse::GetKeyQuietly(response) => { &response.header }
-            BinaryResponse::Set(response) => { &response.header }
-            BinaryResponse::Add(response) => { &response.header }
-            BinaryResponse::Replace(response) => { &response.header }
+            BinaryResponse::Get(response) => &response.header,
+            BinaryResponse::GetQuietly(response) => &response.header,
+            BinaryResponse::GetKey(response) => &response.header,
+            BinaryResponse::GetKeyQuietly(response) => &response.header,
+            BinaryResponse::Set(response) => &response.header,
+            BinaryResponse::Add(response) => &response.header,
+            BinaryResponse::Replace(response) => &response.header,
         }
     }
 }
@@ -128,21 +128,11 @@ impl MemcachedBinaryCodec {
                     key: key,
                 }))
             }
-            Some(binary::Command::GetQuiet) => {
-                None
-            }
-            Some(binary::Command::GetKey) => {
-                None
-            }
-            Some(binary::Command::Flush) => {
-                None
-            }
-            Some(binary::Command::Append) => {
-                None
-            }
-            Some(binary::Command::Prepend) => {
-                None
-            }
+            Some(binary::Command::GetQuiet) => None,
+            Some(binary::Command::GetKey) => None,
+            Some(binary::Command::Flush) => None,
+            Some(binary::Command::Append) => None,
+            Some(binary::Command::Prepend) => None,
             Some(binary::Command::Set) => {
                 let extras_size = self.header.extras_length;
                 assert_eq!(extras_size, 8);
@@ -161,90 +151,34 @@ impl MemcachedBinaryCodec {
                 };
                 Some(BinaryRequest::Set(set_request))
             }
-            Some(binary::Command::Add) => {
-                None
-            }
-            Some(binary::Command::Replace) => {
-                None
-            }
-            Some(binary::Command::Delete) => {
-                None
-            }
-            Some(binary::Command::Increment) => {
-                None
-            }
-            Some(binary::Command::Decrement) => {
-                None
-            }
-            Some(binary::Command::Quit) => {
-                None
-            }
-            Some(binary::Command::QuitQuiet) => {
-                None
-            }
-            Some(binary::Command::Noop) => {
-                None
-            }
-            Some(binary::Command::Version) => {
-                None
-            }
-            Some(binary::Command::GetKeyQuiet) => {
-                None
-            }
-            Some(binary::Command::Stat) => {
-                None
-            }
-            Some(binary::Command::SetQuiet) => {
-                None
-            }
-            Some(binary::Command::AddQuiet) => {
-                None
-            }
-            Some(binary::Command::ReplaceQuiet) => {
-                None
-            }
-            Some(binary::Command::DeleteQuiet) => {
-                None
-            }
-            Some(binary::Command::IncrementQuiet) => {
-                None
-            }
-            Some(binary::Command::DecrementQuiet) => {
-                None
-            }
-            Some(binary::Command::FlushQuiet) => {
-                None
-            }
-            Some(binary::Command::AppendQuiet) => {
-                None
-            }
-            Some(binary::Command::PrependQuiet) => {
-                None
-            }
-            Some(binary::Command::Touch) => {
-                None
-            }
-            Some(binary::Command::GetAndTouch) => {
-                None
-            }
-            Some(binary::Command::GetAndTouchQuiet) => {
-                None
-            }
-            Some(binary::Command::GetAndTouchKey) => {
-                None
-            }
-            Some(binary::Command::GetAndTouchKeyQuiet) => {
-                None
-            }
-            Some(binary::Command::SaslListMechs) => {
-                None
-            }
-            Some(binary::Command::SaslAuth) => {
-                None
-            }
-            Some(binary::Command::SaslStep) => {
-                None
-            }
+            Some(binary::Command::Add) => None,
+            Some(binary::Command::Replace) => None,
+            Some(binary::Command::Delete) => None,
+            Some(binary::Command::Increment) => None,
+            Some(binary::Command::Decrement) => None,
+            Some(binary::Command::Quit) => None,
+            Some(binary::Command::QuitQuiet) => None,
+            Some(binary::Command::Noop) => None,
+            Some(binary::Command::Version) => None,
+            Some(binary::Command::GetKeyQuiet) => None,
+            Some(binary::Command::Stat) => None,
+            Some(binary::Command::SetQuiet) => None,
+            Some(binary::Command::AddQuiet) => None,
+            Some(binary::Command::ReplaceQuiet) => None,
+            Some(binary::Command::DeleteQuiet) => None,
+            Some(binary::Command::IncrementQuiet) => None,
+            Some(binary::Command::DecrementQuiet) => None,
+            Some(binary::Command::FlushQuiet) => None,
+            Some(binary::Command::AppendQuiet) => None,
+            Some(binary::Command::PrependQuiet) => None,
+            Some(binary::Command::Touch) => None,
+            Some(binary::Command::GetAndTouch) => None,
+            Some(binary::Command::GetAndTouchQuiet) => None,
+            Some(binary::Command::GetAndTouchKey) => None,
+            Some(binary::Command::GetAndTouchKeyQuiet) => None,
+            Some(binary::Command::SaslListMechs) => None,
+            Some(binary::Command::SaslAuth) => None,
+            Some(binary::Command::SaslStep) => None,
             None => {
                 println!("Cannot parse command opcode {:?}", self.header);
                 None

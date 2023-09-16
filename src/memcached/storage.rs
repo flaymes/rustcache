@@ -1,5 +1,4 @@
 use std::collections::hash_map::DefaultHasher;
-use std::collections::HashMap;
 use std::hash::Hasher;
 use std::str;
 
@@ -33,10 +32,7 @@ pub struct ValueData {
 impl ValueData {
     pub fn new(key: Vec<u8>, value: Vec<u8>, cas: u64, flags: u32, expiration: u32) -> ValueData {
         let header = ValueHeader::new(key, cas, flags, expiration);
-        ValueData {
-            header,
-            value,
-        }
+        ValueData { header, value }
     }
 }
 
@@ -60,7 +56,7 @@ pub struct Storage {
 impl Storage {
     pub fn new() -> Storage {
         Storage {
-            memory: dashmap::DashMap::new()
+            memory: dashmap::DashMap::new(),
         }
     }
 
@@ -72,7 +68,7 @@ impl Storage {
 
     fn get_by_hash(&self, hash: u64) -> Option<Record> {
         let value = match self.memory.get(&hash) {
-            None => { None }
+            None => None,
             Some(record) => {
                 if self.check_if_expired(&record) {
                     None
@@ -90,13 +86,13 @@ impl Storage {
         let header = self.get_header(&record);
         let hash = self.get_hash(&header.key);
         println!("Insert: {:?}=>{:?}", hash, str::from_utf8(&header.key));
-        self.memory.insert(hash,record);
+        self.memory.insert(hash, record);
     }
 
     fn get_header<'a>(&self, record: &'a Record) -> &'a ValueHeader {
         match record {
-            Record::Value(data) => { &data.header }
-            Record::Counter(counter) => { &counter.header }
+            Record::Value(data) => &data.header,
+            Record::Counter(counter) => &counter.header,
         }
     }
 

@@ -47,7 +47,6 @@ pub enum Command {
     SaslStep = 0x22,
 }
 
-
 #[derive(FromPrimitive)]
 pub enum ResponseStatus {
     Success = 0x00,
@@ -83,17 +82,16 @@ pub struct RequestHeader {
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone, Default)]
 pub struct ResponseHeader {
-   pub(crate) magic: u8,
-   pub(crate) opcode: u8,
-   pub(crate) key_length: u16,
-   pub(crate) extras_length: u8,
-   pub(crate) data_type: u8,
-   pub(crate) status: u16,
-   pub(crate) body_length: u32,
-   pub(crate) opaque: u32,
-   pub(crate) cas: u64,
+    pub(crate) magic: u8,
+    pub(crate) opcode: u8,
+    pub(crate) key_length: u16,
+    pub(crate) extras_length: u8,
+    pub(crate) data_type: u8,
+    pub(crate) status: u16,
+    pub(crate) body_length: u32,
+    pub(crate) opaque: u32,
+    pub(crate) cas: u64,
 }
-
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Request {
@@ -107,7 +105,6 @@ pub struct Response {
 
 pub type NoopRequest = Request;
 pub type NoopResponse = Response;
-
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GetRequest {
@@ -130,19 +127,17 @@ pub struct GetResponse {
 pub type DeleteRequest = GetRequest;
 pub type DeleteResponse = Response;
 
-
 pub type GetQuietlyResponse = GetResponse;
 pub type GetKeyResponse = GetResponse;
 pub type GetKeyQuietlyResponse = GetResponse;
 
-
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SetRequest {
-   pub(crate) header: RequestHeader,
-   pub(crate) flags: u32,
-   pub(crate) expiration: u32,
-   pub(crate) key: Vec<u8>,
-   pub(crate) value: Vec<u8>,
+    pub(crate) header: RequestHeader,
+    pub(crate) flags: u32,
+    pub(crate) expiration: u32,
+    pub(crate) key: Vec<u8>,
+    pub(crate) value: Vec<u8>,
 }
 
 pub type AddRequest = SetRequest;
