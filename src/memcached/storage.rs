@@ -1,7 +1,7 @@
-use std::collections::hash_map::DefaultHasher;
 use std::hash::Hasher;
 use std::str;
 use std::sync::Arc;
+use crate::memcached::error::StorageResult;
 use crate::memcached::timer;
 
 #[derive(Clone)]
@@ -80,12 +80,13 @@ impl Storage {
         false
     }
     fn touch_record(&self, record: &mut Record) {
-        record.header.timestamp=self.timer.secs()
+        record.header.timestamp = self.timer.secs()
     }
-    pub fn set(&self, key: Vec<u8>, mut record: Record) {
+    pub fn set(&self, key: Vec<u8>, mut record: Record) -> StorageResult<()> {
         println!("Insert: {:?}", key);
         self.touch_record(&mut record);
         self.memory.insert(key, record);
+        Ok(())
     }
 
     pub fn add(&self, key: Vec<u8>, record: Record) {}
@@ -105,10 +106,19 @@ impl Storage {
 }
 
 #[cfg(test)]
-mod tests{
+mod tests {
+    use super::*;
 
     #[test]
-    fn internal(){
-        assert_eq!(3,3)
+    fn insert() {
+        let timer: Arc<Box<dyn timer::Timer + Sync + Send>> = Arc::new(Box::new(timer::SystemTimer::new()));
+        let storage = Storage::new(timer);
+        let record = Record::new(String::from("Test data").into_bytes(),0,0,0);
+        let result = storage.set(String::from("key1").into_bytes(), record);
+        assert!(result.is_ok());
+
+        let value = storage.get(&String::from("key1").into_bytes()).unwrap();
+        assert_eq!(value.value, String::from("Test data").into_bytes());
+
     }
 }
