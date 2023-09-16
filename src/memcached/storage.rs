@@ -1,9 +1,7 @@
 use std::collections::hash_map::DefaultHasher;
 use std::collections::HashMap;
 use std::hash::Hasher;
-use std::ptr::hash;
-use std::sync::Mutex;
-use crate::protocol::binary::ResponseHeader;
+use std::str;
 
 #[derive(Clone)]
 pub struct ValueHeader {
@@ -56,34 +54,34 @@ pub enum Record {
 }
 
 pub struct Storage {
-    memory: Mutex<HashMap<u64, Record>>,
+    memory: dashmap::DashMap<u64, Record>,
 }
 
 impl Storage {
     pub fn new() -> Storage {
         Storage {
-            memory: Mutex::new(HashMap::new()),
+            memory: dashmap::DashMap::new()
         }
     }
 
     pub fn get(&self, key: &Vec<u8>) -> Option<Record> {
         let hash = self.get_hash(key);
+        println!("Get: {:?} => {:?}", hash, std::str::from_utf8(key));
         self.get_by_hash(hash)
     }
 
     fn get_by_hash(&self, hash: u64) -> Option<Record> {
-        let storage = self.memory.lock().unwrap();
-        let value = match storage.get(&hash) {
+        let value = match self.memory.get(&hash) {
             None => { None }
             Some(record) => {
-                if self.check_if_expired(record) {
+                if self.check_if_expired(&record) {
                     None
                 } else {
+                    self.touch(&record);
                     Some(record.clone())
                 }
             }
         };
-
         value
     }
 
@@ -91,8 +89,8 @@ impl Storage {
     pub fn set(&self, record: Record) {
         let header = self.get_header(&record);
         let hash = self.get_hash(&header.key);
-        let mut storage = self.memory.lock().unwrap();
-        storage.insert(hash, record);
+        println!("Insert: {:?}=>{:?}", hash, str::from_utf8(&header.key));
+        self.memory.insert(hash,record);
     }
 
     fn get_header<'a>(&self, record: &'a Record) -> &'a ValueHeader {

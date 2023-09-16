@@ -6,7 +6,6 @@ use tokio::net::{TcpListener, TcpStream, ToSocketAddrs as TokioToSocketAddrs};
 use tokio_util::codec::{FramedRead, FramedWrite};
 use crate::memcached::{handler, storage};
 use crate::protocol::{binary, binary_codec};
-use crate::protocol::binary_codec::BinaryResponse;
 
 pub struct TcpServer {
     storage: Arc<storage::Storage>,
