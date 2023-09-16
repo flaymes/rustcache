@@ -1,5 +1,6 @@
 use num_derive::FromPrimitive;
 use serde_derive::{Deserialize, Serialize};
+use simplelog::Color::Magenta;
 
 #[derive(FromPrimitive)]
 pub enum Magic {
@@ -91,6 +92,16 @@ pub struct ResponseHeader {
     pub(crate) body_length: u32,
     pub(crate) opaque: u32,
     pub(crate) cas: u64,
+}
+
+impl ResponseHeader {
+    pub fn new(cmd: u8) -> Self {
+        ResponseHeader {
+            magic: Magic::Response as u8,
+            opcode: cmd,
+            ..ResponseHeader::default()
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug)]
