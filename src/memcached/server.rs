@@ -1,4 +1,4 @@
-use crate::memcached::{handler, storage};
+use crate::memcached::{handler, storage, timer};
 use crate::protocol::{binary, binary_codec};
 use futures_util::{SinkExt, StreamExt};
 use std::net::ToSocketAddrs;
@@ -14,7 +14,7 @@ pub struct TcpServer {
 impl Default for TcpServer {
     fn default() -> Self {
         TcpServer {
-            storage: Arc::new(storage::Storage::new()),
+            storage: Arc::new(storage::Storage::new(Arc::new(Box::new(timer::SystemTimer::new())))),
         }
     }
 }

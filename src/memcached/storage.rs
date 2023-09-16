@@ -1,6 +1,8 @@
 use std::collections::hash_map::DefaultHasher;
 use std::hash::Hasher;
 use std::str;
+use std::sync::Arc;
+use crate::memcached::timer;
 
 #[derive(Clone)]
 pub struct Header {
@@ -44,19 +46,16 @@ pub type DecrementParam = IncrementParam;
 
 pub struct Storage {
     memory: dashmap::DashMap<Vec<u8>, Record>,
+    timer: Arc<Box<dyn timer::Timer + Send + Sync>>,
 }
 
-impl Default for Storage {
-    fn default() -> Self {
-        Storage {
-            memory: dashmap::DashMap::new(),
-        }
-    }
-}
 
 impl Storage {
-    pub fn new() -> Storage {
-        Default::default()
+    pub fn new(timer: Arc<Box<dyn timer::Timer + Send + Sync>>) -> Storage {
+        Storage {
+            memory: dashmap::DashMap::new(),
+            timer,
+        }
     }
 
     pub fn get(&self, key: &Vec<u8>) -> Option<Record> {
@@ -71,7 +70,6 @@ impl Storage {
                 if self.check_if_expired(key) {
                     None
                 } else {
-                    self.touch(&mut record);
                     Some(record.clone())
                 }
             }
@@ -81,9 +79,12 @@ impl Storage {
     fn check_if_expired(&self, record: &Vec<u8>) -> bool {
         false
     }
-    fn touch(&self, record: &mut Record) {}
-    pub fn set(&self, key: Vec<u8>, record: Record) {
+    fn touch_record(&self, record: &mut Record) {
+        record.header.timestamp=self.timer.secs()
+    }
+    pub fn set(&self, key: Vec<u8>, mut record: Record) {
         println!("Insert: {:?}", key);
+        self.touch_record(&mut record);
         self.memory.insert(key, record);
     }
 
@@ -96,4 +97,18 @@ impl Storage {
     pub fn cas(&self, key: Vec<u8>, record: Record) {}
     pub fn increment(&self, key: Vec<u8>, increment: IncrementParam) {}
     pub fn decrement(&self, key: Vec<u8>, decrement: DecrementParam) {}
+    pub fn delete(&self, key: Vec<u8>, header: Header) {}
+
+    pub fn flush(&self) {}
+
+    pub fn touch(&self, key: Vec<u8>) {}
+}
+
+#[cfg(test)]
+mod tests{
+
+    #[test]
+    fn internal(){
+        assert_eq!(3,3)
+    }
 }
