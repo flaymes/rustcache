@@ -1,8 +1,8 @@
+use crate::memcached::error::StorageResult;
+use crate::memcached::timer;
 use std::hash::Hasher;
 use std::str;
 use std::sync::Arc;
-use crate::memcached::error::StorageResult;
-use crate::memcached::timer;
 
 #[derive(Clone)]
 pub struct Header {
@@ -48,7 +48,6 @@ pub struct Storage {
     memory: dashmap::DashMap<Vec<u8>, Record>,
     timer: Arc<Box<dyn timer::Timer + Send + Sync>>,
 }
-
 
 impl Storage {
     pub fn new(timer: Arc<Box<dyn timer::Timer + Send + Sync>>) -> Storage {
@@ -111,14 +110,14 @@ mod tests {
 
     #[test]
     fn insert() {
-        let timer: Arc<Box<dyn timer::Timer + Sync + Send>> = Arc::new(Box::new(timer::SystemTimer::new()));
+        let timer: Arc<Box<dyn timer::Timer + Sync + Send>> =
+            Arc::new(Box::new(timer::SystemTimer::new()));
         let storage = Storage::new(timer);
-        let record = Record::new(String::from("Test data").into_bytes(),0,0,0);
+        let record = Record::new(String::from("Test data").into_bytes(), 0, 0, 0);
         let result = storage.set(String::from("key1").into_bytes(), record);
         assert!(result.is_ok());
 
         let value = storage.get(&String::from("key1").into_bytes()).unwrap();
         assert_eq!(value.value, String::from("Test data").into_bytes());
-
     }
 }

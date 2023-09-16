@@ -14,7 +14,9 @@ pub struct TcpServer {
 impl Default for TcpServer {
     fn default() -> Self {
         TcpServer {
-            storage: Arc::new(storage::Storage::new(Arc::new(Box::new(timer::SystemTimer::new())))),
+            storage: Arc::new(storage::Storage::new(Arc::new(Box::new(
+                timer::SystemTimer::new(),
+            )))),
         }
     }
 }
