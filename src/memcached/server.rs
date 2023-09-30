@@ -2,21 +2,22 @@ use crate::memcached::{handler, storage, timer};
 use crate::protocol::{binary, binary_codec};
 use futures_util::{SinkExt, StreamExt};
 use std::net::ToSocketAddrs;
-use std::sync::Arc;
+use std::sync::{Arc, RwLock};
 use tokio::io;
 use tokio::net::{TcpListener, TcpStream, ToSocketAddrs as TokioToSocketAddrs};
 use tokio_util::codec::{FramedRead, FramedWrite};
 
 pub struct TcpServer {
+    timer: Arc<dyn timer::Timer + Send + Sync>,
     storage: Arc<storage::Storage>,
 }
 
 impl Default for TcpServer {
     fn default() -> Self {
+        let timer: Arc<dyn timer::Timer + Send + Sync> = Arc::new(timer::SystemTimer::new());
         TcpServer {
-            storage: Arc::new(storage::Storage::new(Arc::new(Box::new(
-                timer::SystemTimer::new(),
-            )))),
+            timer: timer.clone(),
+            storage: Arc::new(storage::Storage::new(timer.clone())),
         }
     }
 }
@@ -47,15 +48,9 @@ impl TcpServer {
                             match result {
                                 Ok(request) => {
                                     let response = handler.handle_request(request);
-                                    match response {
-                                        None => {}
-                                        Some(response) => {
-                                            if let Err(e) = writer.send(response).await {
-                                                println!(
-                                                    "error on sending response; error = {:?}",
-                                                    e
-                                                );
-                                            }
+                                    if let Some(response) = response {
+                                        if let Err(e) = writer.send(response).await {
+                                            println!("error on sending response; error = {:?}", e);
                                         }
                                     }
                                 }

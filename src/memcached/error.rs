@@ -1,8 +1,6 @@
 extern crate failure;
 
-use failure_derive::Fail;
-
-#[derive(Debug, Fail)]
+#[derive(Debug, Fail, PartialEq)]
 pub enum StorageError {
     #[fail(display = "Key not found")]
     NotFound = 0x01,
